@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('betting_options', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('city_event_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->decimal('odds', 8, 2);
+            $table->boolean('active')->default(true);
+            $table->unsignedInteger('position')->default(0);
             $table->timestamps();
         });
     }

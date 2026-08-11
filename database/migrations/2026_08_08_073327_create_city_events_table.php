@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('city_events', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('city_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->boolean('active')->default(true);
             $table->timestamps();
+
+            $table->unique(['city_id', 'event_id']);
         });
     }
 

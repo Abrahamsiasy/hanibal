@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->string('hero_title')->nullable();
+            $table->string('hero_subtitle')->nullable();
+            $table->string('hero_image')->nullable();
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }
