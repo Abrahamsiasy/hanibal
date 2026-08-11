@@ -23,7 +23,8 @@
                     $tax    = $profit * $taxRate;
                     $net    = $gross - $tax;
                 @endphp
-                <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden">
+                <a href="{{ route('bets.show', $bet) }}"
+                   class="block bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden hover:border-zinc-600 transition-colors">
                     <div class="px-4 py-3 border-b border-[#2a2a2a] flex items-center justify-between">
                         <div class="min-w-0">
                             <p class="font-semibold text-white text-sm truncate">{{ $bet->cityEvent->event->title }}</p>
@@ -66,10 +67,11 @@
                             </p>
                         </div>
                     </div>
-                    <div class="px-4 py-2 border-t border-[#2a2a2a] text-xs text-zinc-600">
-                        {{ $bet->created_at->format('M j, Y · g:i A') }}
+                    <div class="px-4 py-2 border-t border-[#2a2a2a] flex items-center justify-between">
+                        <span class="text-xs text-zinc-600">{{ $bet->created_at->format('M j, Y · g:i A') }}</span>
+                        <span class="text-[10px] text-zinc-600 uppercase tracking-wider">View Ticket →</span>
                     </div>
-                </div>
+                </a>
             @empty
                 <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-8 text-center">
                     <p class="text-zinc-500 mb-4">No bets placed yet.</p>
@@ -109,7 +111,7 @@
                                 $tax    = $profit * $taxRate;
                                 $net    = $gross - $tax;
                             @endphp
-                            <tr class="hover:bg-[#222] transition-colors">
+                            <tr class="hover:bg-[#222] transition-colors cursor-pointer" onclick="window.location='{{ route('bets.show', $bet) }}'">
                                 <td class="px-4 py-3">
                                     <p class="font-semibold text-white truncate max-w-[180px]">{{ $bet->cityEvent->event->title }}</p>
                                     <p class="text-xs text-zinc-500 mt-0.5">{{ $bet->cityEvent->city->name }} · {{ $bet->bettingOption->name }}</p>

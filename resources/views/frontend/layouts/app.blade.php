@@ -143,11 +143,14 @@
         @if (! auth()->user()->is_admin)
         <div id="bet-slip"
              style="position:fixed;bottom:64px;left:0;right:0;z-index:9999;pointer-events:none;">
-            <div style="max-width:26rem;margin-left:auto;pointer-events:auto;">
+            {{-- Inner container: flex column, capped height so it never covers the top nav --}}
+            <div style="max-width:26rem;margin-left:auto;pointer-events:auto;
+                        display:flex;flex-direction:column;max-height:calc(100vh - 130px);overflow:hidden;">
 
                 {{-- ① Rows body — scrollable list of selections --}}
                 <div id="bs-body"
-                     style="display:none;background:#111;border:1px solid #2a2a2a;border-bottom:none;overflow-y:auto;max-height:52vh;box-shadow:0 -8px 32px rgba(0,0,0,.8);">
+                     style="display:none;flex:1;min-height:0;background:#111;border:1px solid #2a2a2a;
+                            border-bottom:none;overflow-y:auto;box-shadow:0 -8px 32px rgba(0,0,0,.8);">
                     <div id="bs-rows"></div>
                     {{-- Empty state --}}
                     <div id="bs-empty"
@@ -159,11 +162,13 @@
 
                 {{-- ② Footer — single stake input + totals + submit --}}
                 <div id="bs-footer"
-                     style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-bottom:none;border-top:1px solid #3a3a3a;padding:1rem;box-shadow:0 -4px 16px rgba(0,0,0,.6);">
+                     style="display:none;flex-shrink:0;background:#1a1a1a;border:1px solid #2a2a2a;
+                            border-bottom:none;border-top:1px solid #3a3a3a;padding:.75rem 1rem;
+                            box-shadow:0 -4px 16px rgba(0,0,0,.6);overflow-y:auto;max-height:55vh;">
 
                     {{-- Stake per bet input --}}
-                    <div style="margin-bottom:.75rem;">
-                        <label style="display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#71717a;margin-bottom:.4rem;">
+                    <div style="margin-bottom:.625rem;">
+                        <label style="display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#71717a;margin-bottom:.3rem;">
                             Stake per bet (ETB)
                         </label>
                         <input id="bs-stake-input"
@@ -176,29 +181,49 @@
                                onblur="this.style.borderColor='#3a3a3a'">
                     </div>
 
-                    {{-- Totals summary --}}
-                    <div style="background:#111;border:1px solid #2a2a2a;border-radius:.5rem;overflow:hidden;margin-bottom:.75rem;">
-                        <div style="padding:.5rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
-                            <span style="font-size:.7rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Bets</span>
-                            <span id="bs-total-bets" style="font-size:.8rem;font-weight:700;color:#e4e4e7;">0</span>
+                    {{-- Singles totals summary --}}
+                    <div style="background:#111;border:1px solid #2a2a2a;border-radius:.5rem;overflow:hidden;margin-bottom:.625rem;">
+                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
+                            <span style="font-size:.65rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Bets</span>
+                            <span id="bs-total-bets" style="font-size:.75rem;font-weight:700;color:#e4e4e7;">0</span>
                         </div>
-                        <div style="padding:.5rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
-                            <span style="font-size:.7rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Stake</span>
-                            <span id="bs-total-stake" style="font-size:.8rem;font-weight:700;color:#e4e4e7;">0 ETB</span>
+                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
+                            <span style="font-size:.65rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Stake</span>
+                            <span id="bs-total-stake" style="font-size:.75rem;font-weight:700;color:#e4e4e7;">0 ETB</span>
                         </div>
-                        <div style="padding:.5rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
-                            <span style="font-size:.7rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Tax (15%)</span>
-                            <span id="bs-total-tax" style="font-size:.8rem;font-weight:700;color:#f87171;">−0 ETB</span>
+                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
+                            <span style="font-size:.65rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Tax (15%)</span>
+                            <span id="bs-total-tax" style="font-size:.75rem;font-weight:700;color:#f87171;">−0 ETB</span>
                         </div>
-                        <div style="padding:.6rem .75rem;display:flex;justify-content:space-between;background:#0d0d0d;">
-                            <span style="font-size:.75rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Est. Total Net</span>
-                            <span id="bs-total-net" style="font-size:.95rem;font-weight:900;color:#4ade80;">0 ETB</span>
+                        <div style="padding:.5rem .75rem;display:flex;justify-content:space-between;background:#0d0d0d;">
+                            <span style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Est. Total Net</span>
+                            <span id="bs-total-net" style="font-size:.9rem;font-weight:900;color:#4ade80;">0 ETB</span>
+                        </div>
+                    </div>
+
+                    {{-- Multi / Parlay combined odds (shown when 2+ bets selected) --}}
+                    <div id="bs-parlay-box"
+                         style="display:none;background:#1c1400;border:1px solid #78350f;border-radius:.5rem;
+                                overflow:hidden;margin-bottom:.625rem;">
+                        <div style="padding:.4rem .75rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid #78350f;">
+                            <svg style="width:.85rem;height:.85rem;flex-shrink:0;" fill="none" stroke="#fbbf24" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#fbbf24;font-weight:900;">Combo Multiplier</span>
+                        </div>
+                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #78350f;">
+                            <span style="font-size:.65rem;color:#92400e;text-transform:uppercase;letter-spacing:.06em;">Combined Odds</span>
+                            <span id="bs-combined-odds" style="font-size:.8rem;font-weight:900;color:#fbbf24;">1.00x</span>
+                        </div>
+                        <div style="padding:.5rem .75rem;display:flex;justify-content:space-between;background:#0d0d0d;">
+                            <span style="font-size:.65rem;color:#92400e;text-transform:uppercase;letter-spacing:.06em;">If ALL Win (net)</span>
+                            <span id="bs-combined-net" style="font-size:.85rem;font-weight:900;color:#fbbf24;">— ETB</span>
                         </div>
                     </div>
 
                     <button onclick="window.BetSlip.submit()" id="bs-submit"
                             style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:.5rem;
-                                   padding:.875rem 1rem;font-size:.8rem;font-weight:900;letter-spacing:.12em;
+                                   padding:.75rem 1rem;font-size:.8rem;font-weight:900;letter-spacing:.12em;
                                    text-transform:uppercase;cursor:pointer;">
                         Place Bets
                     </button>
@@ -207,7 +232,7 @@
 
                 {{-- ③ Toggle tab — LAST child, always visible at the bottom --}}
                 <button onclick="window.BetSlip.toggle()"
-                        style="width:100%;display:flex;align-items:center;justify-content:space-between;
+                        style="flex-shrink:0;width:100%;display:flex;align-items:center;justify-content:space-between;
                                padding:.875rem 1.25rem;background:#991b1b;border:none;cursor:pointer;
                                box-shadow:0 -4px 24px rgba(0,0,0,.7);">
                     <div style="display:flex;align-items:center;gap:.625rem;">
@@ -222,11 +247,16 @@
                             0
                         </span>
                     </div>
-                    <svg id="bs-chevron"
-                         style="width:1rem;height:1rem;flex-shrink:0;transition:transform .25s;transform:rotate(180deg);"
-                         fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
-                    </svg>
+                    <div style="display:flex;align-items:center;gap:.5rem;">
+                        <span id="bs-combo-badge" style="display:none;background:#fbbf24;color:#000;font-size:.6rem;
+                              font-weight:900;border-radius:9999px;padding:.15rem .5rem;letter-spacing:.06em;
+                              text-transform:uppercase;">COMBO</span>
+                        <svg id="bs-chevron"
+                             style="width:1rem;height:1rem;flex-shrink:0;transition:transform .25s;transform:rotate(180deg);"
+                             fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+                        </svg>
+                    </div>
                 </button>
             </div>
         </div>
@@ -266,9 +296,11 @@
                 var stake = _stakeNum();
                 var ts    = stake * n;
                 var ttax  = 0, tnet = 0;
+                var combinedOdds = 1;
                 Object.values(_sel).forEach(function (s) {
                     ttax += _tax(s.odds);
                     tnet += _net(s.odds);
+                    combinedOdds *= s.odds;
                 });
 
                 var betsEl  = document.getElementById('bs-total-bets');
@@ -282,6 +314,27 @@
                 if (taxEl)   taxEl.textContent    = '\u2212' + _fmt(ttax) + ' ETB';
                 if (netEl)   netEl.textContent    = _fmt(tnet) + ' ETB';
                 if (btnEl)   btnEl.textContent    = 'Place ' + n + ' Bet' + (n !== 1 ? 's' : '');
+
+                /* ── combo / parlay display ───────────────────────────── */
+                var parlayBox   = document.getElementById('bs-parlay-box');
+                var combOddsEl  = document.getElementById('bs-combined-odds');
+                var combNetEl   = document.getElementById('bs-combined-net');
+                var comboBadge  = document.getElementById('bs-combo-badge');
+
+                if (n >= 2) {
+                    var comboGross  = stake * combinedOdds;
+                    var comboProfit = comboGross - stake;
+                    var comboTax    = comboProfit * TAX;
+                    var comboNet    = comboGross - comboTax;
+
+                    if (parlayBox)  parlayBox.style.display  = 'block';
+                    if (comboBadge) comboBadge.style.display = 'inline-flex';
+                    if (combOddsEl) combOddsEl.textContent   = combinedOdds.toFixed(2) + 'x';
+                    if (combNetEl)  combNetEl.textContent    = stake > 0 ? _fmt(comboNet) + ' ETB' : '\u2014 ETB';
+                } else {
+                    if (parlayBox)  parlayBox.style.display  = 'none';
+                    if (comboBadge) comboBadge.style.display = 'none';
+                }
             }
 
             /* ── render rows ──────────────────────────────────────────── */

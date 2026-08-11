@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\EventStatus;
 use App\Http\Controllers\Controller;
 use App\Models\City;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class CityController extends Controller
 {
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
+        if (auth()->check() && ! auth()->user()->is_admin && auth()->user()->city_id) {
+            return redirect()->route('cities.show', auth()->user()->city);
+        }
+
         $cities = City::query()->where('active', true)->orderBy('name')->get();
 
         return view('frontend.cities.index', compact('cities'));

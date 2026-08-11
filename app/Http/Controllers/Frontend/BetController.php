@@ -31,6 +31,14 @@ class BetController extends Controller
         return view('frontend.bets.index', compact('bets'));
     }
 
+    public function show(Request $request, Bet $bet): View
+    {
+        abort_unless($bet->user_id === $request->user()->id, 403);
+        $bet->load(['cityEvent.city', 'cityEvent.event', 'bettingOption']);
+
+        return view('frontend.bets.show', compact('bet'));
+    }
+
     public function store(Request $request, City $city, Event $event): RedirectResponse
     {
         $validated = $request->validate([

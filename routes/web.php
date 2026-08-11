@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/wallet/withdraw', [WalletController::class, 'storeWithdrawal'])->name('wallet.withdraw');
 
     Route::get('/bets', [BetController::class, 'index'])->name('bets.index');
+    Route::get('/bets/{bet}', [BetController::class, 'show'])->name('bets.show');
     Route::post('/bets/multi', [BetController::class, 'storeMulti'])->name('bets.multi');
     Route::post('/c/{city}/events/{event}/bets', [BetController::class, 'store'])->name('cities.events.bets.store');
 });
