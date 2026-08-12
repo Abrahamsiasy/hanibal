@@ -144,7 +144,7 @@
         <div id="bet-slip"
              style="position:fixed;bottom:64px;left:0;right:0;z-index:9999;pointer-events:none;">
             {{-- Inner container: flex column, capped height so it never covers the top nav --}}
-            <div style="max-width:26rem;margin-left:auto;pointer-events:auto;
+            <div style="max-width:20rem;margin-left:auto;pointer-events:auto;
                         display:flex;flex-direction:column;max-height:calc(100vh - 130px);overflow:hidden;">
 
                 {{-- ① Rows body — scrollable list of selections --}}
@@ -183,20 +183,34 @@
 
                     {{-- Singles totals summary --}}
                     <div style="background:#111;border:1px solid #2a2a2a;border-radius:.5rem;overflow:hidden;margin-bottom:.625rem;">
-                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
-                            <span style="font-size:.65rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Bets</span>
-                            <span id="bs-total-bets" style="font-size:.75rem;font-weight:700;color:#e4e4e7;">0</span>
+                        {{-- Collapsible breakdown rows --}}
+                        <div id="bs-breakdown" style="display:none;">
+                            <div style="padding:.35rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
+                                <span style="font-size:.6rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Bets</span>
+                                <span id="bs-total-bets" style="font-size:.7rem;font-weight:700;color:#e4e4e7;">0</span>
+                            </div>
+                            <div style="padding:.35rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
+                                <span style="font-size:.6rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Stake</span>
+                                <span id="bs-total-stake" style="font-size:.7rem;font-weight:700;color:#e4e4e7;">0 ETB</span>
+                            </div>
+                            <div style="padding:.35rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #1a1a1a;">
+                                <span style="font-size:.6rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Tax (15%)</span>
+                                <span id="bs-total-tax" style="font-size:.7rem;font-weight:700;color:#f87171;">−0 ETB</span>
+                            </div>
                         </div>
-                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
-                            <span style="font-size:.65rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Stake</span>
-                            <span id="bs-total-stake" style="font-size:.75rem;font-weight:700;color:#e4e4e7;">0 ETB</span>
-                        </div>
-                        <div style="padding:.4rem .75rem;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;">
-                            <span style="font-size:.65rem;color:#71717a;text-transform:uppercase;letter-spacing:.06em;">Total Tax (15%)</span>
-                            <span id="bs-total-tax" style="font-size:.75rem;font-weight:700;color:#f87171;">−0 ETB</span>
-                        </div>
-                        <div style="padding:.5rem .75rem;display:flex;justify-content:space-between;background:#0d0d0d;">
-                            <span style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Est. Total Net</span>
+                        {{-- Always-visible net row with expand toggle --}}
+                        <div onclick="window.BetSlip.toggleBreakdown()"
+                             style="padding:.5rem .75rem;display:flex;justify-content:space-between;align-items:center;
+                                    background:#0d0d0d;cursor:pointer;"
+                             onmouseover="this.style.background='#151515'" onmouseout="this.style.background='#0d0d0d'">
+                            <div style="display:flex;align-items:center;gap:.4rem;">
+                                <span style="font-size:.65rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;font-weight:700;">Est. Net</span>
+                                <svg id="bs-breakdown-chevron"
+                                     style="width:.65rem;height:.65rem;flex-shrink:0;transition:transform .2s;color:#52525b;"
+                                     fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
                             <span id="bs-total-net" style="font-size:.9rem;font-weight:900;color:#4ade80;">0 ETB</span>
                         </div>
                     </div>
@@ -506,6 +520,15 @@
                 expand  : function () { _expand(); },
                 collapse: function () { _collapse(); },
                 toggle  : function () { if (_open) _collapse(); else _expand(); },
+
+                toggleBreakdown: function () {
+                    var box     = document.getElementById('bs-breakdown');
+                    var chevron = document.getElementById('bs-breakdown-chevron');
+                    if (!box) return;
+                    var open = box.style.display !== 'none';
+                    box.style.display           = open ? 'none' : 'block';
+                    if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+                },
 
                 showMsg: function (text, type) {
                     var el = document.getElementById('bs-msg');
